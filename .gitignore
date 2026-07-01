@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Generated dataset splits (regenerate with `python -m utils.split_data`)
+dataset/splits/*.csv
+
+# Generated training artifacts
+checkpoints/*.pth
+results/**/*.json
+results/**/*.csv
+results/**/*.txt
+plots/**/*.png
+logs/*.log
+logs/*.json
+
+# Keep folder placeholders
+!checkpoints/.gitkeep
+!results/.gitkeep
+!plots/.gitkeep
+!logs/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/
