@@ -3,7 +3,7 @@
 A complete, production-quality PyTorch pipeline for classifying maize (corn) leaf images into
 four categories using a custom CNN baseline and a ResNet18 transfer-learning model. Built for
 the **Deep Learning for Image Classification & Segmentation** assignment (Image Analysis
-Groups 1, 2, 5, 6, 7, 8, 9).
+Groups 9).
 
 Runs entirely locally in VS Code — no Google Colab required. The device (CPU/CUDA) is detected
 automatically at runtime.
