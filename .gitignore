@@ -30,5 +30,5 @@ logs/*.json
 .DS_Store
 Thumbs.db
 
-# Streamlit
-.streamlit/
+# Streamlit (keep config.toml, ignore any local secrets)
+.streamlit/secrets.toml

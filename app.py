@@ -19,7 +19,73 @@ import config
 from models import get_model
 from utils.transforms import get_eval_transforms
 
-st.set_page_config(page_title="Corn Leaf Disease Classifier", page_icon="🌽", layout="wide")
+st.set_page_config(page_title="Corn Leaf Disease Classifier", layout="wide")
+
+CUSTOM_CSS = """
+<style>
+#MainMenu, footer {visibility: hidden;}
+
+.app-header {
+    background: linear-gradient(120deg, #1B5E20 0%, #2E7D32 55%, #558B2F 100%);
+    padding: 2rem 2.5rem;
+    border-radius: 14px;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 4px 18px rgba(27, 94, 32, 0.25);
+}
+.app-header h1 {
+    color: #FFFFFF;
+    margin: 0;
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+.app-header p {
+    color: #E8F5E9;
+    margin: 0.5rem 0 0 0;
+    font-size: 1.02rem;
+}
+
+section[data-testid="stSidebar"] {
+    background-color: #F7FAF7;
+    border-right: 1px solid #E0E8E0;
+}
+section[data-testid="stSidebar"] h2 {
+    color: #1B5E20;
+}
+
+div[data-testid="stMetric"] {
+    background-color: #F1F8F2;
+    border: 1px solid #DCEDC8;
+    border-left: 4px solid #2E7D32;
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+}
+
+.stTabs [data-baseweb="tab-list"] {
+    gap: 6px;
+}
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px 8px 0 0;
+    padding: 10px 18px;
+    font-weight: 600;
+}
+.stTabs [aria-selected="true"] {
+    background-color: #E8F5E9;
+    color: #1B5E20 !important;
+}
+
+div[data-testid="stStatusWidget"], .stAlert {
+    border-radius: 10px;
+}
+
+.class-list-item {
+    padding: 0.25rem 0;
+    color: #33413A;
+    font-size: 0.92rem;
+}
+</style>
+"""
+st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
 
 # --------------------------------------------------------------------------
@@ -52,7 +118,7 @@ def predict(model, image: Image.Image, device: torch.device):
 # --------------------------------------------------------------------------
 # Sidebar
 # --------------------------------------------------------------------------
-st.sidebar.title("🌽 Model Settings")
+st.sidebar.header("Model Settings")
 st.sidebar.markdown(f"**Device:** `{config.DEVICE}`")
 
 model_choice = st.sidebar.selectbox("Model architecture", ["resnet18", "baseline"], index=0)
@@ -74,20 +140,27 @@ else:
     st.sidebar.success(f"Loaded epoch {checkpoint.get('epoch')} | val_acc={checkpoint.get('val_acc'):.4f}")
 
 st.sidebar.markdown("---")
-st.sidebar.caption("Classes")
-for short, full in zip(config.CLASS_SHORT_NAMES, config.CLASS_NAMES):
-    st.sidebar.caption(f"• {short}")
+st.sidebar.caption("CLASSES")
+for short in config.CLASS_SHORT_NAMES:
+    st.sidebar.markdown(f'<div class="class-list-item">— {short}</div>', unsafe_allow_html=True)
 
 
 # --------------------------------------------------------------------------
-# Main tabs
+# Header
 # --------------------------------------------------------------------------
-st.title("Corn Leaf Disease Classification")
-st.caption("Deep learning pipeline for classifying maize leaves as healthy or affected by "
-           "Gray Leaf Spot, Common Rust, or Northern Leaf Blight.")
+st.markdown(
+    """
+    <div class="app-header">
+        <h1>Corn Leaf Disease Classification</h1>
+        <p>Deep learning pipeline for classifying maize leaves as healthy or affected by
+        Gray Leaf Spot, Common Rust, or Northern Leaf Blight.</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 tab_single, tab_batch, tab_performance, tab_curves = st.tabs(
-    ["🔍 Single Image", "📁 Batch Prediction", "📊 Model Performance", "📈 Training Curves"]
+    ["Single Image", "Batch Prediction", "Model Performance", "Training Curves"]
 )
 
 # --- Single image prediction -----------------------------------------------
@@ -112,7 +185,7 @@ with tab_single:
                 "Class": config.CLASS_SHORT_NAMES,
                 "Probability": probs,
             }).sort_values("Probability", ascending=False)
-            st.bar_chart(prob_df.set_index("Class"))
+            st.bar_chart(prob_df.set_index("Class"), color="#2E7D32")
             st.dataframe(prob_df.style.format({"Probability": "{:.2%}"}), use_container_width=True, hide_index=True)
     elif model is None:
         st.info("Select a model with an available checkpoint from the sidebar.")
@@ -144,7 +217,7 @@ with tab_batch:
 
         results_df = pd.DataFrame(rows)
         st.dataframe(results_df, use_container_width=True, hide_index=True)
-        st.bar_chart(results_df["predicted_class"].value_counts())
+        st.bar_chart(results_df["predicted_class"].value_counts(), color="#2E7D32")
 
         csv_bytes = results_df.to_csv(index=False).encode("utf-8")
         st.download_button("Download predictions as CSV", csv_bytes, "predictions.csv", "text/csv")
