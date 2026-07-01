@@ -54,6 +54,22 @@ this is fully reproducible and avoids duplicating the dataset on disk. Re-run
 - **Background noise** (soil, adjacent leaves, hands) — mitigated with random crop / affine /
   perspective augmentation during training.
 
+### Preprocessing & augmentation
+
+All splits are resized to 224x224 and normalized with ImageNet mean/std (required for the
+pretrained ResNet18 backbone; applied identically to the baseline CNN for a fair comparison).
+Training images additionally go through (`utils/transforms.py::get_train_transforms`):
+
+- `RandomResizedCrop`, `RandomHorizontalFlip` — standard flip/crop augmentation
+- `RandomRotation` — rotation augmentation
+- `ColorJitter` (brightness/contrast/saturation/hue) — lighting robustness
+- `RandomAffine` + `RandomPerspective` — geometric/viewpoint robustness
+- `AddGaussianNoise` (custom, `p=0.3`, applied post-`ToTensor`) — noise injection, simulating
+  sensor noise / compression artifacts in field-captured leaf photos
+
+Validation/test/inference use a deterministic `Resize` + `Normalize` pipeline only (no
+augmentation), so evaluation numbers reflect real-world inference conditions.
+
 ## Project structure
 
 ```

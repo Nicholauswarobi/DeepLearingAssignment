@@ -1,9 +1,21 @@
 """torchvision transform pipelines for training, evaluation, and inference."""
 from __future__ import annotations
 
+import torch
 from torchvision import transforms
 
 import config
+
+
+class AddGaussianNoise(torch.nn.Module):
+    """Injects zero-mean Gaussian noise into a tensor image (applied after ToTensor)."""
+
+    def __init__(self, std: float = 0.05):
+        super().__init__()
+        self.std = std
+
+    def forward(self, tensor: torch.Tensor) -> torch.Tensor:
+        return torch.clamp(tensor + torch.randn_like(tensor) * self.std, 0.0, 1.0)
 
 
 def get_train_transforms(image_size: tuple[int, int] = config.IMAGE_SIZE) -> transforms.Compose:
@@ -17,6 +29,7 @@ def get_train_transforms(image_size: tuple[int, int] = config.IMAGE_SIZE) -> tra
             transforms.RandomAffine(degrees=0, translate=(0.1, 0.1), shear=10),
             transforms.RandomPerspective(distortion_scale=0.2, p=0.3),
             transforms.ToTensor(),
+            transforms.RandomApply([AddGaussianNoise(std=0.05)], p=0.3),
             transforms.Normalize(mean=config.IMAGENET_MEAN, std=config.IMAGENET_STD),
         ]
     )
