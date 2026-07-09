@@ -9,11 +9,9 @@ venv/
 dataset/splits/*.csv
 
 # Generated training artifacts
-checkpoints/*.pth
 results/**/*.json
 results/**/*.csv
 results/**/*.txt
-plots/**/*.png
 logs/*.log
 logs/*.json
 
