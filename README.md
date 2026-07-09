@@ -215,13 +215,33 @@ model first (`python train.py --model resnet18`) so a checkpoint exists to load.
 
 ## Jupyter notebook
 
-`notebook/Corn_Leaf_Disease_Classification.ipynb` walks through the entire pipeline end-to-end —
-dataset overview, augmentation preview, model architecture summary, training both models,
-evaluation, model comparison, a hyperparameter-search cell, and a single-image prediction demo.
-It imports and calls the exact same functions used by `train.py` / `evaluate.py` / `predict.py`
-(no duplicated logic), so notebook results land in the same `checkpoints/`, `results/`, and
-`plots/` folders the CLI scripts and Streamlit app read from. A `NOTEBOOK_EPOCHS` variable lets
-you run a quick demo (e.g. 5 epochs) before committing to the full 30-epoch training run.
+`notebook/Corn_Leaf_Disease_Classification.ipynb` is the **written report** for the assignment, not
+a training demo. **It does not train anything.** Training is done ahead of time from the terminal
+(`python train.py --model both`); the notebook loads the resulting checkpoints from `checkpoints/`
+and runs **inference only** on the held-out test set.
+
+It is structured to follow the assignment tasks:
+
+1. **Dataset Selection & Preparation** — split strategy, class distribution, preprocessing and
+   augmentation previews, and a documented analysis of the dataset's challenges.
+2. **Model Training** — architectures, hyperparameters, the four regularizers, training/validation
+   curves and an overfitting analysis read from `logs/{model}_history.json`.
+3. **Evaluation** — accuracy/precision/recall/F1/ROC-AUC, per-class reports, confusion matrices with
+   a ranked error breakdown, ROC and PR curves, misclassified samples, and the baseline-vs-ResNet18
+   comparison.
+4. **Deliverables** — checklist and conclusion.
+
+Two safety properties, so the report can never contradict the weights it describes:
+
+- The training cell is guarded by `RETRAIN = False` and will refuse to run — "Run All" cannot
+  overwrite your checkpoints.
+- Every plotting call passes `save_path=None`, so the notebook never writes to `checkpoints/`,
+  `results/`, or `plots/`. It is strictly read-only.
+
+It imports and calls the exact same functions used by `train.py` / `evaluate.py` / `predict.py` (no
+duplicated logic), so its numbers cannot silently drift from the CLI's. Runtime is ~1–2 minutes on
+CPU. Train at least one model first, or the notebook's checkpoint-inventory cell will fail fast with
+an explanatory message.
 
 ## Model architectures
 
